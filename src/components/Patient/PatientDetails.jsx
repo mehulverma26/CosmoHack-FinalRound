@@ -30,12 +30,6 @@ function PatientDetails({ setIsLoggedIn }) {
 
   return (
     <main className="max-w-5xl mx-auto">
-        <motion.section
-        className="card p-10 mt-20 space-y-6"
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-      ></motion.section>
         <section className="card p-10 max-w-xl mx-auto space-y-6">
         <h2 className="text-3xl font-bold text-center">Patient Details</h2>
         <p className="text-center text-gray-500">

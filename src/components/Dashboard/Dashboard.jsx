@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { searchDoctorsAPI } from "../../App";
 
 function Dashboard() {
@@ -67,17 +66,20 @@ function Dashboard() {
     let currentDoctor = null;
 
     lines.forEach((line) => {
+      // Doctor name detection
       if (/^dr\./i.test(line)) {
         if (currentDoctor) doctors.push(currentDoctor);
         currentDoctor = { name: line, details: [] };
         return;
       }
 
+      // Doctor details
       if (currentDoctor) {
         currentDoctor.details.push(line);
         return;
       }
 
+      // Key info rules (NO doctor names / numbering)
       if (
         !line.toLowerCase().includes("dr.") &&
         !/^\d+\./.test(line) &&
@@ -89,7 +91,10 @@ function Dashboard() {
 
     if (currentDoctor) doctors.push(currentDoctor);
 
-    return { doctors, info: info.slice(0, 5) };
+    return {
+      doctors,
+      info: info.slice(0, 5), // limit key info to 5 clean points
+    };
   }
 
   /* -------------------------------
@@ -137,54 +142,34 @@ function Dashboard() {
     }
   }
 
-  /* -------------------------------
-     ANIMATION VARIANTS
-  -------------------------------- */
-  const fadeUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 },
-  };
-
   return (
-    <motion.main
-      className="max-w-6xl mx-auto"
-      initial="hidden"
-      animate="visible"
-      variants={{ visible: { transition: { staggerChildren: 0.1 } } }}
-    >
-      <motion.section
-        className="card p-8 space-y-6"
-        variants={fadeUp}
-      >
+    <main className="max-w-6xl mx-auto">
+      <section className="card p-8 space-y-6">
         <h2 className="text-2xl font-bold">
           {patientName ? `Welcome, ${patientName}` : "Dashboard"}
         </h2>
 
         {/* METRICS */}
         <div className="grid md:grid-cols-3 gap-6">
-          {[phqScore, severity, risk].map((_, i) => (
-            <motion.div
-              key={i}
-              className="card p-4 text-center"
-              variants={fadeUp}
-            >
-              <p className="text-sm text-gray-500">
-                {i === 0 ? "PHQ Score" : i === 1 ? "Severity" : "Risk Level"}
-              </p>
-              <h3 className="text-3xl font-bold">
-                {i === 0 ? phqScore : i === 1 ? severity : risk}
-              </h3>
-            </motion.div>
-          ))}
+          <div className="card p-4 text-center">
+            <p className="text-sm text-gray-500">PHQ Score</p>
+            <h3 className="text-3xl font-bold">{phqScore}</h3>
+          </div>
+          <div className="card p-4 text-center">
+            <p className="text-sm text-gray-500">Severity</p>
+            <h3 className="font-semibold">{severity}</h3>
+          </div>
+          <div className="card p-4 text-center">
+            <p className="text-sm text-gray-500">Risk Level</p>
+            <h3 className="font-semibold">{risk}</h3>
+          </div>
         </div>
 
         {/* RECOMMENDATION */}
-        <motion.p className="text-gray-600" variants={fadeUp}>
-          {recommendation}
-        </motion.p>
+        <p className="text-gray-600">{recommendation}</p>
 
         {/* SEARCH */}
-        <motion.div variants={fadeUp}>
+        <div>
           <h3 className="font-semibold mb-2">Find Doctors Near You</h3>
           <input
             type="text"
@@ -193,34 +178,21 @@ function Dashboard() {
             value={location}
             onChange={(e) => setLocation(e.target.value)}
           />
-          <motion.button
+          <button
             onClick={findDoctors}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.95 }}
             className="btn-primary w-full py-3"
           >
             Find Doctors Near Me
-          </motion.button>
-        </motion.div>
+          </button>
+        </div>
 
-        {loading && (
-          <motion.p
-            className="text-center text-emerald-600"
-            animate={{ opacity: [0.4, 1, 0.4] }}
-            transition={{ repeat: Infinity, duration: 1.2 }}
-          >
-            Searching trusted professionals…
-          </motion.p>
-        )}
+        {loading && <div className="loading-spinner" />}
 
         {/* RESULTS */}
         {showResults && (
-          <motion.div
-            className="grid md:grid-cols-3 gap-6 mt-6"
-            variants={fadeUp}
-          >
-            {/* KEY INSIGHTS */}
-            <motion.div className="md:col-span-1 card p-5" variants={fadeUp}>
+          <div className="grid md:grid-cols-3 gap-6 mt-6">
+            {/* KEY INFORMATION */}
+            <div className="md:col-span-1 card p-5">
               <h3 className="font-semibold mb-4 text-emerald-600">
                 Key Insights
               </h3>
@@ -239,32 +211,35 @@ function Dashboard() {
                   ))}
                 </ul>
               )}
-            </motion.div>
+            </div>
 
             {/* DOCTOR CARDS */}
-            <motion.div
-              className="md:col-span-2 grid sm:grid-cols-2 gap-6"
-              variants={{ visible: { transition: { staggerChildren: 0.15 } } }}
-            >
-              {doctorResults.map((doc, index) => (
-                <motion.div
-                  key={index}
-                  className="doctor-card"
-                  variants={fadeUp}
-                >
-                  <h4 className="doctor-name">{doc.name}</h4>
-                  <ul className="doctor-details">
-                    {doc.details.map((d, i) => (
-                      <li key={i}>{d}</li>
-                    ))}
-                  </ul>
-                </motion.div>
-              ))}
-            </motion.div>
-          </motion.div>
+            <div className="md:col-span-2">
+              <h3 className="font-semibold mb-4">Recommended Doctors</h3>
+
+              {doctorResults.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  No doctors found for this location.
+                </p>
+              ) : (
+                <div className="grid sm:grid-cols-2 gap-6">
+                  {doctorResults.map((doc, index) => (
+                    <div key={index} className="doctor-card">
+                      <h4 className="doctor-name">{doc.name}</h4>
+                      <ul className="doctor-details">
+                        {doc.details.map((d, i) => (
+                          <li key={i}>{d}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
         )}
-      </motion.section>
-    </motion.main>
+      </section>
+    </main>
   );
 }
 
