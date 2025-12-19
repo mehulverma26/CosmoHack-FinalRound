@@ -89,7 +89,7 @@ function App() {
 
   return (
     <Router>
-      {isLoggedIn && <Navbar />}
+      {<Navbar /> && isLoggedIn}
 
       <Routes>
         <Route
