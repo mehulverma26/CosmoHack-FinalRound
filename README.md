@@ -122,6 +122,7 @@ A deterministic and explainable fusion engine combines:
 
 ## 📂 Project Structure
 
+```
 src/
 │── components/
 │ ├── Home/
@@ -138,6 +139,7 @@ src/
 │ ├── testing.py
 │── public/models/
 │ └── phq9_severity_xgboost.onnx
+```
 
 ---
 
