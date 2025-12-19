@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { predictSeverityONNX } from "../../utils/onnxSeverity";
 import { analyzeSentiment } from "../../utils/sentiment";
-import { fuseMentalHealthSignals } from "../../utils/fusion"; // ✅ FUSION
+import { fuseMentalHealthSignals } from "../../utils/fusion";
 
 function Assessment() {
   const [submitting, setSubmitting] = useState(false);
@@ -24,12 +24,11 @@ function Assessment() {
   ];
 
   /* -------------------------------
-     RENDER PHQ-9 QUESTIONS
+     RENDER PHQ-9
   -------------------------------- */
   useEffect(() => {
     const form = document.getElementById("phq-form");
     if (!form) return;
-
     form.innerHTML = "";
 
     questions.forEach((q, index) => {
@@ -59,17 +58,15 @@ function Assessment() {
   }, []);
 
   /* -------------------------------
-     SUBMIT PHQ-9 → ONNX MODEL
+     SUBMIT PHQ-9 → ONNX
   -------------------------------- */
   const submitAssessment = async () => {
     setSubmitting(true);
 
-    let payload = {};
+    const payload = {};
     for (let i = 1; i <= 9; i++) {
-      const selected = document.querySelector(
-        `input[name="phq${i}"]:checked`
-      );
-      payload[`phq${i}`] = selected ? selected.value : 0;
+      const sel = document.querySelector(`input[name="phq${i}"]:checked`);
+      payload[`phq${i}`] = sel ? sel.value : 0;
     }
 
     try {
@@ -81,62 +78,47 @@ function Assessment() {
           phq_sum: Object.values(payload).reduce((a, b) => a + Number(b), 0),
           severity_text: result.severity_text,
           risk_label: result.risk_level,
-          severity_level: result.severity_level, // ✅ IMPORTANT FOR FUSION
+          severity_level: result.severity_level,
         })
       );
 
       setSubmitting(false);
       setShowEmotionPrompt(true);
     } catch (err) {
-      console.error("ONNX inference failed:", err);
+      console.error(err);
       setSubmitting(false);
     }
   };
 
   /* -------------------------------
-     HANDLE EMOTIONAL TEXT INPUT
+     TEXT INPUT
   -------------------------------- */
   const handleEmotionChange = (e) => {
-    const words = e.target.value.trim().split(/\s+/).filter(Boolean);
-    if (words.length <= WORD_LIMIT) {
-      setEmotionText(e.target.value);
-    }
+    const words = e.target.value.trim().split(/\s+/);
+    if (words.length <= WORD_LIMIT) setEmotionText(e.target.value);
   };
 
   /* -------------------------------
-     CONTINUE → SENTIMENT + FUSION
+     SENTIMENT + FUSION
   -------------------------------- */
   const continueAfterPrompt = () => {
-    const sentimentResult = analyzeSentiment(emotionText);
-    const dashboardData = JSON.parse(localStorage.getItem("dashboardData"));
+    const sentiment = analyzeSentiment(emotionText);
+    const dashboard = JSON.parse(localStorage.getItem("dashboardData"));
 
-    // 🔥 FUSION LOGIC
-    const fusionResult = fuseMentalHealthSignals({
-      severityLevel: dashboardData.severity_level,
-      severityText: dashboardData.severity_text,
-      sentimentLabel: sentimentResult.label,
-      sentimentConfidence: sentimentResult.confidence,
+    const fusion = fuseMentalHealthSignals({
+      severityLevel: dashboard.severity_level,
+      sentimentLabel: sentiment.label,
+      sentimentConfidence: sentiment.confidence,
+      emotionText,
     });
 
-    // Save sentiment
-    localStorage.setItem(
-      "sentimentData",
-      JSON.stringify({
-        text: emotionText,
-        ...sentimentResult,
-      })
-    );
+    localStorage.setItem("emotionNarrative", emotionText);
+    localStorage.setItem("sentimentData", JSON.stringify(sentiment));
+    localStorage.setItem("fusionData", JSON.stringify(fusion));
 
-    // Save fusion result
-    localStorage.setItem(
-      "fusionData",
-      JSON.stringify(fusionResult)
-    );
-
-    setShowEmotionPrompt(false);
     window.location.href = "/dashboard";
   };
-
+  
   const goBackToAssessment = () => {
     setShowEmotionPrompt(false);
   };

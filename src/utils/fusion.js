@@ -1,45 +1,51 @@
 /**
- * Rule-based fusion of clinical PHQ-9 severity
+ * Rule-based fusion of PHQ-9 clinical severity
  * and emotional sentiment analysis
- *
- * This module does NOT use ML.
- * It combines outputs of two independent models.
+ * (Explainable & deterministic)
  */
 
-/**
- * @param {Object} params
- * @param {number} params.severityLevel - 0 to 4 (PHQ-9 severity class)
- * @param {string} params.severityText - Human readable severity
- * @param {string} params.sentimentLabel - Positive | Neutral | Negative
- * @param {number} params.sentimentConfidence - 0 to 1
- *
- * @returns {Object} fused decision
- */
+const RED_FLAG_KEYWORDS = [
+  "kill myself",
+  "suicide",
+  "end my life",
+  "want to die",
+  "die",
+  "self harm",
+  "hurt myself",
+  "no reason to live",
+  "giving up",
+  "can't go on",
+];
+
 export function fuseMentalHealthSignals({
   severityLevel,
-  severityText,
   sentimentLabel,
   sentimentConfidence,
+  emotionText,
 }) {
-  let finalRisk = "LOW / MODERATE";
-  let alertLevel = "NORMAL";
-  let explanation = "Standard mental health assessment outcome";
+  const text = emotionText.toLowerCase();
 
-  /* ==================================================
-     RULE 1: High clinical severity dominates everything
-     ================================================== */
+  /* 🚨 RULE 0 — RED FLAG OVERRIDE */
+  if (RED_FLAG_KEYWORDS.some((k) => text.includes(k))) {
+    return {
+      finalRisk: "HIGH RISK",
+      alertLevel: "CRITICAL",
+      explanation:
+        "Self-harm or suicidal ideation detected in emotional narrative.",
+    };
+  }
+
+  /* 🚨 RULE 1 — SEVERE PHQ-9 */
   if (severityLevel >= 3) {
     return {
       finalRisk: "HIGH RISK",
       alertLevel: "CRITICAL",
       explanation:
-        "High PHQ-9 severity indicates serious depressive symptoms requiring immediate professional intervention.",
+        "Severe PHQ-9 score indicates high clinical depression risk.",
     };
   }
 
-  /* ==================================================
-     RULE 2: Moderate PHQ + strong negative emotion
-     ================================================== */
+  /* ⚠️ RULE 2 — MODERATE + NEGATIVE SENTIMENT */
   if (
     severityLevel === 2 &&
     sentimentLabel === "Negative" &&
@@ -47,65 +53,26 @@ export function fuseMentalHealthSignals({
   ) {
     return {
       finalRisk: "HIGH RISK",
-      alertLevel: "ESCALATED",
-      explanation:
-        "Moderate clinical symptoms combined with strong negative emotional expression suggest elevated psychological distress.",
-    };
-  }
-
-  /* ==================================================
-     RULE 3: Mild PHQ + negative emotional narrative
-     ================================================== */
-  if (
-    severityLevel === 1 &&
-    sentimentLabel === "Negative" &&
-    sentimentConfidence >= 0.6
-  ) {
-    return {
-      finalRisk: "MEDIUM RISK",
       alertLevel: "WARNING",
       explanation:
-        "Mild PHQ-9 symptoms but emotionally negative narrative indicate early warning signs of mental health decline.",
+        "Moderate depression combined with strong negative emotional tone.",
     };
   }
 
-  /* ==================================================
-     RULE 4: Minimal PHQ but emotionally distressed
-     ================================================== */
-  if (
-    severityLevel === 0 &&
-    sentimentLabel === "Negative" &&
-    sentimentConfidence >= 0.7
-  ) {
+  /* ⚠️ RULE 3 — MILD + NEGATIVE */
+  if (severityLevel === 1 && sentimentLabel === "Negative") {
     return {
       finalRisk: "MEDIUM RISK",
       alertLevel: "MONITOR",
       explanation:
-        "Low clinical score but strong emotional distress detected through sentiment analysis requires close monitoring.",
+        "Early depressive symptoms with negative emotional state detected.",
     };
   }
 
-  /* ==================================================
-     RULE 5: Positive emotional protective factor
-     ================================================== */
-  if (
-    sentimentLabel === "Positive" &&
-    sentimentConfidence >= 0.6
-  ) {
-    return {
-      finalRisk: "LOW RISK",
-      alertLevel: "PROTECTIVE",
-      explanation:
-        "Positive emotional expression acts as a protective psychological factor despite clinical symptoms.",
-    };
-  }
-
-  /* ==================================================
-     DEFAULT CASE
-     ================================================== */
+  /* ✅ DEFAULT */
   return {
-    finalRisk,
-    alertLevel,
-    explanation,
+    finalRisk: "LOW / MODERATE",
+    alertLevel: "NORMAL",
+    explanation: "Standard mental health assessment outcome.",
   };
 }

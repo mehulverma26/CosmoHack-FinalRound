@@ -17,8 +17,9 @@ function Dashboard() {
   const [keyInfo, setKeyInfo] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
-  // ⭐ SENTIMENT STATE
+  // ⭐ SENTIMENT + FUSION STATE
   const [sentiment, setSentiment] = useState(null);
+  const [fusion, setFusion] = useState(null);
 
   /* -------------------------------
      LOAD PATIENT + DASHBOARD DATA
@@ -28,23 +29,28 @@ function Dashboard() {
     const dashboardData = JSON.parse(
       localStorage.getItem("dashboardData") || "{}"
     );
-
     const sentimentData = JSON.parse(
       localStorage.getItem("sentimentData") || "null"
+    );
+    const fusionData = JSON.parse(
+      localStorage.getItem("fusionData") || "null"
     );
 
     if (patient.name) setPatientName(patient.name);
 
     setPhqScore(dashboardData.phq_sum ?? "--");
     setSeverity(dashboardData.severity_text ?? "--");
-    setRisk(dashboardData.risk_label ?? "--");
+
+    // 🔥 Risk priority: Fusion > PHQ-only
+    setRisk(fusionData?.finalRisk ?? dashboardData.risk_label ?? "--");
+
     setRecommendation(
       dashboardData.recommendation_message ??
         "Take the assessment to view results."
     );
 
-    // ⭐ LOAD SENTIMENT
     if (sentimentData) setSentiment(sentimentData);
+    if (fusionData) setFusion(fusionData);
   }, []);
 
   /* -------------------------------
@@ -62,7 +68,7 @@ function Dashboard() {
   }
 
   /* -------------------------------
-     PARSE GEMINI RESPONSE (SAFE)
+     PARSE GEMINI RESPONSE
   -------------------------------- */
   function parseGeminiResponse(text) {
     const lines = text
@@ -72,7 +78,6 @@ function Dashboard() {
 
     const doctors = [];
     const info = [];
-
     let currentDoctor = null;
 
     lines.forEach((line) => {
@@ -87,21 +92,12 @@ function Dashboard() {
         return;
       }
 
-      if (
-        !line.toLowerCase().includes("dr.") &&
-        !/^\d+\./.test(line) &&
-        line.length > 40
-      ) {
-        info.push(line);
-      }
+      if (line.length > 40) info.push(line);
     });
 
     if (currentDoctor) doctors.push(currentDoctor);
 
-    return {
-      doctors,
-      info: info.slice(0, 5),
-    };
+    return { doctors, info: info.slice(0, 5) };
   }
 
   /* -------------------------------
@@ -172,7 +168,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* ⭐ SENTIMENT DISPLAY */}
+        {/* SENTIMENT */}
         {sentiment && (
           <div className="card p-5 border-l-4 border-emerald-500">
             <h3 className="font-semibold mb-2">🧠 Emotional Sentiment</h3>
@@ -194,6 +190,16 @@ function Dashboard() {
               <strong>Confidence:</strong>{" "}
               {(sentiment.confidence * 100).toFixed(1)}%
             </p>
+          </div>
+        )}
+
+        {/* 🧩 FUSION RESULT */}
+        {fusion && (
+          <div className="card p-5 border-l-4 border-red-500 bg-red-50">
+            <h3 className="font-semibold mb-2">🧩 Final Risk Assessment</h3>
+            <p><strong>Final Risk:</strong> {fusion.finalRisk}</p>
+            <p><strong>Alert Level:</strong> {fusion.alertLevel}</p>
+            <p className="text-sm mt-2">{fusion.explanation}</p>
           </div>
         )}
 
