@@ -1,21 +1,21 @@
-import React from "react";
+import React, { useState } from "react";
 import Home from "./components/Home/home";
 import Navbar from "./components/Navbar";
 import Assessment from "./components/Assessment/Assessment";
 import Dashboard from "./components/Dashboard/Dashboard";
-import PatientDetail from "./components/PatientDetail/PatientDetail";
+import PatientDetails from "./components/Patient/PatientDetails";
 
 import {
   BrowserRouter as Router,
-  Route,
   Routes,
+  Route,
   Navigate,
 } from "react-router-dom";
 
 import "./App.css";
 import "./dark.css";
 
-/* ------------------ Flask logic rewritten in JS ------------------ */
+/* ------------------ SEVERITY LOGIC ------------------ */
 
 const SEVERITY_MAP = {
   0: "Minimal Depression",
@@ -26,48 +26,27 @@ const SEVERITY_MAP = {
 };
 
 const RECOMMENDATION_MAP = {
-  0: [
-    "Your symptoms indicate minimal depression. Maintain healthy routines.",
-    "general wellness",
-  ],
-  1: [
-    "Mild symptoms detected. Consider self-care and monitoring.",
-    "mental health support",
-  ],
-  2: [
-    "Moderate symptoms detected. Professional consultation is recommended.",
-    "therapy",
-  ],
-  3: [
-    "High risk detected. Please seek professional mental health support immediately.",
-    "psychiatrist",
-  ],
-  4: [
-    "Severe symptoms detected. Urgent professional intervention is required.",
-    "emergency mental health",
-  ],
+  0: ["Maintain healthy routines.", "general wellness"],
+  1: ["Monitor symptoms.", "mental health support"],
+  2: ["Professional consultation recommended.", "therapy"],
+  3: ["Seek mental health support immediately.", "psychiatrist"],
+  4: ["Urgent intervention required.", "emergency mental health"],
 };
 
-function mapSeverity(phqSum) {
-  if (phqSum <= 4) return 0;
-  if (phqSum <= 9) return 1;
-  if (phqSum <= 14) return 2;
-  if (phqSum <= 19) return 3;
+function mapSeverity(sum) {
+  if (sum <= 4) return 0;
+  if (sum <= 9) return 1;
+  if (sum <= 14) return 2;
+  if (sum <= 19) return 3;
   return 4;
 }
 
-/* --------------------------------------------------------------- */
-/* 🔵 Gemini API helper (SAFE)                                      */
-/* --------------------------------------------------------------- */
+/* ------------------ GEMINI API ------------------ */
 
 const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
 export async function searchDoctorsAPI({ location, search_context }) {
-  if (!GEMINI_API_KEY) {
-    throw new Error("Gemini API key missing");
-  }
-
-  const prompt = `Find top-rated ${search_context} near ${location} with contact details.`;
+  const prompt = `Find top-rated ${search_context} near ${location} with details.`;
 
   const res = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${GEMINI_API_KEY}`,
@@ -81,50 +60,60 @@ export async function searchDoctorsAPI({ location, search_context }) {
     }
   );
 
-  if (!res.ok) {
-    throw new Error("Gemini request failed");
-  }
-
   return res.json();
 }
 
-/* --------------------------------------------------------------- */
+/* ------------------ APP ------------------ */
 
 function App() {
-  // 🔴 Replaces Flask `/api/predict_severity`
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    !!localStorage.getItem("patientData")
+  );
+
   const predictSeverity = (payload) => {
-    const phqSum = Object.values(payload).reduce(
-      (sum, v) => sum + Number(v),
-      0
+    const sum = Object.values(payload).reduce((a, b) => a + Number(b), 0);
+    const sev = mapSeverity(sum);
+    const [msg, ctx] = RECOMMENDATION_MAP[sev];
+
+    localStorage.setItem(
+      "dashboardData",
+      JSON.stringify({
+        phq_sum: sum,
+        severity_text: SEVERITY_MAP[sev],
+        risk_label: sev >= 3 ? "HIGH RISK" : "LOW / MODERATE",
+        recommendation_message: msg,
+        search_context: ctx,
+      })
     );
-
-    const sevId = mapSeverity(phqSum);
-    const [msg, ctx] = RECOMMENDATION_MAP[sevId];
-
-    const result = {
-      phq_sum: phqSum,
-      severity_text: SEVERITY_MAP[sevId],
-      risk_label: sevId >= 3 ? "HIGH RISK" : "LOW / MODERATE RISK",
-      recommendation_message: msg,
-      search_context: ctx,
-    };
-
-    localStorage.setItem("dashboardData", JSON.stringify(result));
-    return result;
   };
 
   return (
     <Router>
-      <Navbar />
+      {isLoggedIn && <Navbar />}
+
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route
+          path="/"
+          element={<PatientDetails setIsLoggedIn={setIsLoggedIn} />}
+        />
+        <Route
+          path="/home"
+          element={isLoggedIn ? <Home /> : <Navigate to="/" />}
+        />
         <Route
           path="/assessment"
-          element={<Assessment predictSeverity={predictSeverity} />}
+          element={
+            isLoggedIn ? (
+              <Assessment predictSeverity={predictSeverity} />
+            ) : (
+              <Navigate to="/" />
+            )
+          }
         />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/patient" element={<PatientDetail />} />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route
+          path="/dashboard"
+          element={isLoggedIn ? <Dashboard /> : <Navigate to="/" />}
+        />
       </Routes>
     </Router>
   );
