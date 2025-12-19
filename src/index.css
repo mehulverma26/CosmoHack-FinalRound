@@ -1,68 +1,335 @@
+@import "tailwindcss";
+/* ===============================
+   GLOBAL THEME
+================================ */
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
-}
-
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
+    --primary: #10b981;
+    --primary-dark: #059669;
+    --bg-light: #f7f9fb;
+    --text-dark: #1f2937;
+    --text-muted: #6b7280;
+    --glass-bg: rgba(255, 255, 255, 0.75);
+    --glass-border: rgba(255, 255, 255, 0.35);
+  }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #eef2f7, #f7f9fb);
+    color: var(--text-dark);
+  }
+  
+  /* ===============================
+     GLASS CARD EFFECT
+  ================================ */
+  .card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid var(--glass-border);
+    border-radius: 18px;
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  .card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 35px 70px rgba(0, 0, 0, 0.12);
+  }
+  
+  /* ===============================
+     HEADERS
+  ================================ */
+  header h1 {
+    letter-spacing: -0.02em;
+  }
+  
+  header p {
+    font-size: 0.95rem;
+  }
+  
+  /* ===============================
+     INPUTS & SELECTS
+  ================================ */
+  input,
+  select {
+    transition: all 0.25s ease;
+  }
+  
+  input:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.25);
+  }
+  
+  /* ===============================
+     BUTTONS
+  ================================ */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #34d399);
+    color: white;
+    font-weight: 600;
+    border-radius: 12px;
+  }
+  
+  .btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), var(--primary));
+    transform: translateY(-1px);
+  }
+  
+  .btn-secondary {
+    background-color: #e5e7eb;
+    color: #374151;
+    border-radius: 12px;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #d1d5db;
+  }
+  
+  /* ===============================
+     QUESTION CARDS
+  ================================ */
+  #phq-form > div {
+    transition: all 0.3s ease;
+  }
+  
+  #phq-form > div:hover {
     background-color: #ffffff;
+    transform: scale(1.01);
   }
-  a:hover {
-    color: #747bff;
+  
+  /* ===============================
+     PROGRESS BAR
+  ================================ */
+  #progress-bar {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.6);
   }
-  button {
-    background-color: #f9f9f9;
+  
+  /* ===============================
+     SEVERITY STYLES
+  ================================ */
+  .severity-minimal {
+    background: linear-gradient(135deg, #d1fae5, #ecfdf5);
+    color: #065f46;
+    border-color: #34d399;
   }
-}
+  
+  .severity-mild {
+    background: linear-gradient(135deg, #fef3c7, #fffbeb);
+    color: #92400e;
+    border-color: #fcd34d;
+  }
+  
+  .severity-moderate {
+    background: linear-gradient(135deg, #fee2e2, #fef2f2);
+    color: #991b1b;
+    border-color: #f87171;
+  }
+  
+  .severity-severe {
+    background: linear-gradient(135deg, #fecaca, #fff1f2);
+    color: #7f1d1d;
+    border-color: #ef4444;
+  }
+  
+  /* ===============================
+     RESULTS SECTION
+  ================================ */
+  #severity-display h3 {
+    letter-spacing: -0.03em;
+  }
+  
+  #recommendation-message {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+  
+  /* ===============================
+     SEARCH RESULTS
+  ================================ */
+  #search-output > div {
+    transition: all 0.25s ease;
+  }
+  
+  #search-output > div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* ===============================
+     LOADING OVERLAY
+  ================================ */
+  #loading-indicator {
+    backdrop-filter: blur(6px);
+  }
+  
+  /* ===============================
+     TOAST
+  ================================ */
+  .toast {
+    animation: slideUp 0.4s ease;
+  }
+  
+  @keyframes slideUp {
+    from {
+      opacity: 0;
+      transform: translate(-50%, 20px);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+  
+  /* ===============================
+     MOBILE POLISH
+  ================================ */
+  @media (max-width: 640px) {
+    header h1 {
+      font-size: 1.6rem;
+    }
+  }
+  body.dark {
+    background: linear-gradient(135deg, #0f172a, #020617);
+    color: #e5e7eb;
+  }
+  
+  body.dark .card {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  body.dark input,
+  body.dark select {
+    background-color: #020617;
+    color: #e5e7eb;
+    border-color: #334155;
+  }
+  
+  body.dark .btn-secondary {
+    background-color: #1e293b;
+    color: #e5e7eb;
+  }
+  
+  body.dark .severity-minimal,
+  body.dark .severity-mild,
+  body.dark .severity-moderate,
+  body.dark .severity-severe {
+    filter: brightness(0.9);
+  }
+ /* ===============================
+   NAV ITEM HOVER (FIXED)
+================================ */
+
+.nav-links .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 14px;
+    font-weight: 500;
+    color: #334155;
+    position: relative;
+    transition: 
+      background-color 0.25s ease,
+      color 0.25s ease,
+      transform 0.2s ease,
+      box-shadow 0.25s ease;
+  }
+  
+  /* STRONGER hover */
+  .nav-links .nav-item:hover {
+    background: rgba(16, 185, 129, 0.18);
+    color: #059669;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+  }
+  
+  /* ACTIVE PAGE */
+  .nav-links .nav-item.active {
+    background: rgba(16, 185, 129, 0.25);
+    color: #047857;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
+  }  
+  
+  /* Logo */
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  
+  /* Nav items (you already had hover styles) */
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+/* ===============================
+   PAGE CONTENT SPACING
+================================ */
+
+main {
+    padding-top: 20px;
+  }
+  
+  /* Space after hero / dashboard sections */
+  section {
+    margin-bottom: 64px; 
+  }
+  .doctor-card {
+    background: white;
+    border-radius: 16px;
+    padding: 18px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    margin-bottom: 16px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .doctor-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.12);
+  }
+  
+  .doctor-name {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #047857;
+    margin-bottom: 6px;
+  }
+  
+  .doctor-details {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #334155;
+  }
+  .doctor-link {
+    color: #0ea5e9;
+    font-weight: 500;
+    word-break: break-word;
+  }
+  
+  .doctor-link:hover {
+    text-decoration: underline;
+  }
+
+  .loading-spinner {
+    width: 42px;
+    height: 42px;
+    border: 4px solid #e5e7eb;
+    border-top: 4px solid #10b981;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+    margin: 24px auto;
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }

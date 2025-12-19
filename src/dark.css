@@ -1,0 +1,190 @@
+/* ===============================
+   GLOBAL DARK MODE
+================================ */
+
+body.dark {
+    background: linear-gradient(135deg, #020617, #0f172a);
+    color: #e5e7eb;
+  }
+  
+  /* ===============================
+     NAVBAR
+  ================================ */
+  
+  body.dark nav {
+    background: rgba(15, 23, 42, 0.85);
+  }
+  
+  body.dark nav a,
+  body.dark nav button {
+    color: #e5e7eb;
+  }
+  
+  body.dark nav a:hover,
+  body.dark nav button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  /* ===============================
+     GLASS CARDS
+  ================================ */
+  
+  body.dark .card {
+    background: rgba(30, 41, 59, 0.85);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+  }
+  
+  /* ===============================
+     HEADINGS & TEXT
+  ================================ */
+  
+  body.dark h1,
+  body.dark h2,
+  body.dark h3 {
+    color: #3d8fe0;
+  }
+  
+  body.dark p,
+  body.dark span,
+  body.dark label {
+    color: #3760e9;
+  }
+  
+  /* ===============================
+     INPUTS & SELECTS
+  ================================ */
+  
+  body.dark input,
+  body.dark select {
+    background-color: #020617;
+    color: #e5e7eb;
+    border: 1px solid #334155;
+  }
+  
+  body.dark input::placeholder {
+    color: #94a3b8;
+  }
+  
+  body.dark input:focus,
+  body.dark select:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.35);
+  }
+  
+  /* ===============================
+     BUTTONS
+  ================================ */
+  
+  body.dark .btn-primary {
+    background: linear-gradient(135deg, #059669, #10b981);
+  }
+  
+  body.dark .btn-secondary {
+    background-color: #1e293b;
+    color: #3569d3;
+  }
+  
+  body.dark .btn-secondary:hover {
+    background-color: #334155;
+  }
+  
+  /* ===============================
+     ASSESSMENT QUESTIONS
+  ================================ */
+  
+  body.dark .border {
+    border-color: #334155;
+  }
+  
+  body.dark .hover\:bg-gray-100:hover {
+    background-color: #1e293b;
+  }
+  
+  /* ===============================
+     DASHBOARD METRICS
+  ================================ */
+  
+  body.dark #severity-display {
+    border-color: #10b981;
+  }
+  
+  body.dark #phq-score,
+  body.dark #risk,
+  body.dark #severity {
+    color: #0e7be8;
+  }
+  
+  /* ===============================
+     LINKS
+  ================================ */
+  
+  body.dark a {
+    color: #a5b4fc;
+  }
+  
+  body.dark a:hover {
+    color: #c7d2fe;
+  }
+  
+  /* ===============================
+     SCROLLBAR (OPTIONAL POLISH)
+  ================================ */
+  
+  body.dark ::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  body.dark ::-webkit-scrollbar-track {
+    background: #020617;
+  }
+  
+  body.dark ::-webkit-scrollbar-thumb {
+    background: #334155;
+    border-radius: 6px;
+  }
+  
+  body.dark ::-webkit-scrollbar-thumb:hover {
+    background: #475569;
+  }
+/* ===============================
+   NAV ITEM HOVER — DARK MODE
+================================ */
+
+body.dark .nav-links .nav-item {
+    color: #e5e7eb;
+  }
+  
+  body.dark .nav-links .nav-item:hover {
+    background: rgba(16, 185, 129, 0.28);
+    color: #6ee7b7;
+    box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+  }
+  
+  body.dark .nav-links .nav-item:hover i {
+    stroke: #6ee7b7;
+  }
+  
+  body.dark .nav-links .nav-item.active {
+    background: rgba(16, 185, 129, 0.35);
+    color: #6ee7b7;
+  }
+
+  .nav-links .nav-item i {
+    width: 18px;
+    height: 18px;
+    stroke-width: 2;
+    transition: stroke 0.25s ease;
+  }
+  
+  .nav-links .nav-item:hover i {
+    stroke: #059669;
+  }
+  
+body.dark { background:#020617; color:rgb(134, 76, 76) }
+body.dark .card { background:#1e293b }
+
+  
+  
