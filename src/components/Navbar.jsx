@@ -37,7 +37,7 @@ function Navbar() {
           style={{ cursor: "pointer" }}
         >
           <HeartPulse />
-          <span>MindCare</span>
+          <span>CodeCure</span>
           <br />
           <br />
         </div>
