@@ -17,6 +17,9 @@ function Dashboard() {
   const [keyInfo, setKeyInfo] = useState([]);
   const [showResults, setShowResults] = useState(false);
 
+  // ⭐ SENTIMENT STATE
+  const [sentiment, setSentiment] = useState(null);
+
   /* -------------------------------
      LOAD PATIENT + DASHBOARD DATA
   -------------------------------- */
@@ -24,6 +27,10 @@ function Dashboard() {
     const patient = JSON.parse(localStorage.getItem("patientData") || "{}");
     const dashboardData = JSON.parse(
       localStorage.getItem("dashboardData") || "{}"
+    );
+
+    const sentimentData = JSON.parse(
+      localStorage.getItem("sentimentData") || "null"
     );
 
     if (patient.name) setPatientName(patient.name);
@@ -35,6 +42,9 @@ function Dashboard() {
       dashboardData.recommendation_message ??
         "Take the assessment to view results."
     );
+
+    // ⭐ LOAD SENTIMENT
+    if (sentimentData) setSentiment(sentimentData);
   }, []);
 
   /* -------------------------------
@@ -66,20 +76,17 @@ function Dashboard() {
     let currentDoctor = null;
 
     lines.forEach((line) => {
-      // Doctor name detection
       if (/^dr\./i.test(line)) {
         if (currentDoctor) doctors.push(currentDoctor);
         currentDoctor = { name: line, details: [] };
         return;
       }
 
-      // Doctor details
       if (currentDoctor) {
         currentDoctor.details.push(line);
         return;
       }
 
-      // Key info rules (NO doctor names / numbering)
       if (
         !line.toLowerCase().includes("dr.") &&
         !/^\d+\./.test(line) &&
@@ -93,7 +100,7 @@ function Dashboard() {
 
     return {
       doctors,
-      info: info.slice(0, 5), // limit key info to 5 clean points
+      info: info.slice(0, 5),
     };
   }
 
@@ -164,6 +171,31 @@ function Dashboard() {
             <h3 className="font-semibold">{risk}</h3>
           </div>
         </div>
+
+        {/* ⭐ SENTIMENT DISPLAY */}
+        {sentiment && (
+          <div className="card p-5 border-l-4 border-emerald-500">
+            <h3 className="font-semibold mb-2">🧠 Emotional Sentiment</h3>
+            <p>
+              <strong>Sentiment:</strong>{" "}
+              <span
+                className={
+                  sentiment.label === "Positive"
+                    ? "text-green-600"
+                    : sentiment.label === "Negative"
+                    ? "text-red-600"
+                    : "text-yellow-600"
+                }
+              >
+                {sentiment.label}
+              </span>
+            </p>
+            <p>
+              <strong>Confidence:</strong>{" "}
+              {(sentiment.confidence * 100).toFixed(1)}%
+            </p>
+          </div>
+        )}
 
         {/* RECOMMENDATION */}
         <p className="text-gray-600">{recommendation}</p>
