@@ -186,5 +186,65 @@ body.dark .nav-links .nav-item {
 body.dark { background:#020617; color:rgb(134, 76, 76) }
 body.dark .card { background:#1e293b }
 
-  
+
+/* Hide any radio inputs if inherited accidentally */
+.dark .fixed input[type="radio"] {
+  display: none !important;
+  appearance: none !important;
+}
+
+/* Ensure popup ONLY styles textarea */
+.dark .fixed textarea {
+  display: block !important;
+}
+/* ======================================
+   FORCE DARK MODE FOR EMOTION POPUP
+====================================== */
+
+/* Popup container */
+.dark .fixed .bg-white {
+  background-color: #020617 !important; /* near-black */
+  color: #e5e7eb !important;           /* light text */
+}
+
+/* Headings & paragraphs inside popup */
+.dark .fixed h3,
+.dark .fixed p {
+  color: #e5e7eb !important;
+}
+
+/* Textarea fix */
+.dark .fixed textarea {
+  background-color: #020617 !important;
+  color: #e5e7eb !important;
+  border: 1px solid #334155 !important;
+  caret-color: #22c55e !important; /* green cursor */
+}
+
+/* Placeholder text */
+.dark .fixed textarea::placeholder {
+  color: #94a3b8 !important;
+}
+
+/* Word counter */
+.dark .fixed .text-gray-500 {
+  color: #94a3b8 !important;
+}
+
+/* Continue button (enabled) */
+.dark .fixed .btn-primary {
+  background-color: #22c55e !important;
+  color: #020617 !important;
+}
+
+/* Continue button (disabled) */
+.dark .fixed button:disabled {
+  background-color: #1e293b !important;
+  color: #64748b !important;
+}
+
+/* Darker overlay */
+.dark .bg-black\/40 {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+}
   
